@@ -30,15 +30,23 @@ public final class TwitterGet {
 		return Holder.twitterGet;
 	}
 
+	private TwitterGet() {
+		try {
+			conn = TwitterDao.getInstance().getConnection();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private final TwitterDao twitterDao = TwitterDao.getInstance();
 	private final MatchKeyword matchKeyword = new MatchKeyword();;
-	private final LinkedList<Twitter> twitterList = new LinkedList<Twitter>();
-	
 	private TwitterStream twitterStream;
+
 	private String oAuthConsumerKey;
 	private String oAuthConsumerSecret;
 	private String token;
 	private String tokenSecret;
+	private Connection conn;
 
 	public void getTweets() {
 		checkTableExist();
@@ -64,12 +72,11 @@ public final class TwitterGet {
 						Long timestamp = status.getCreatedAt().getTime();
 						Twitter twitter = new Twitter(twitterId, username, latitude, longitude, content, timestamp,
 								category);
-						twitterList.add(twitter);
-						if (twitterList.size() == 10) {
-							insertTwitterIntoDatabase(twitterList);
-							twitterList.clear();
+						try {
+							twitterDao.insert(conn, twitter);
+						} catch (SQLException e) {
+							e.printStackTrace();
 						}
-						
 					}
 				}
 			}
@@ -104,6 +111,12 @@ public final class TwitterGet {
 	}
 
 	public void shutdownTwitterStream() {
+		System.out.println("twitter stream shut down");
+		try {
+			DatabaseUtil.getInstance().releaseConnection(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		twitterStream.shutdown();
 	}
 
@@ -141,10 +154,4 @@ public final class TwitterGet {
 		}
 	}
 
-	private void insertTwitterIntoDatabase(LinkedList<Twitter> twitterList) {
-		while (!twitterDao.batchInsert(twitterList)) {
-			System.out.println("Update failed, Retrying");
-		}
-		System.out.println("Update successful");
-	}
 }

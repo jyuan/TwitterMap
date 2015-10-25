@@ -1,3 +1,4 @@
+var interval = 5000;
 var map, heatmap;
 var url = window.location.href+ "api/get/twitter";
 var twitter, musicTwitter, newsTwitter, jobTwitter, movieTwitter, 
@@ -53,6 +54,25 @@ function loadHeatmap() {
 	heatmap.setMap(map);
 }
 
+function updateRealTime() {
+	musicTwitter = new google.maps.MVCArray([]);
+	newsTwitter = new google.maps.MVCArray([]);
+	gameTwitter = new google.maps.MVCArray([]);
+	jobTwitter = new google.maps.MVCArray([]);
+	androidTwitter = new google.maps.MVCArray([]);
+	movieTwitter = new google.maps.MVCArray([]);
+	amazonTwitter = new google.maps.MVCArray([]);
+	halloweenTwitter = new google.maps.MVCArray([]);
+	twitter = new google.maps.MVCArray([]);
+	addDataIntoMap(url);
+}
+
+function startTimer() {
+	timer = setInterval(function() {
+		updateRealTime();
+	}, interval);
+}
+
 $(document).ready(function() {
 	musicTwitter = new google.maps.MVCArray([]);
 	newsTwitter = new google.maps.MVCArray([]);
@@ -65,6 +85,8 @@ $(document).ready(function() {
 	twitter = new google.maps.MVCArray([]);
 	google.maps.event.addDomListener(window, 'load', initialize);
 	addDataIntoMap(url);
+	
+	startTimer();
 	
 	$('#select').change(function() { 
 		var category = $(this).children('option:selected').val();

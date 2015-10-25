@@ -9,7 +9,7 @@ import java.util.Properties;
 public class DatabaseUtil {
 
 	private static final String PROPERTIES_NAME = "config.properties";
-	private static final String PROPERTIES_NOT_FOUND = "property file '" + PROPERTIES_NAME 
+	private static final String PROPERTIES_NOT_FOUND = "property file '" + PROPERTIES_NAME
 			+ "' not found in the classpath";
 
 	private DatabaseUtil() {
@@ -31,18 +31,24 @@ public class DatabaseUtil {
 		return connection;
 	}
 
-	public void release(ResultSet resultSet, Statement statement, Connection conn) throws SQLException {
-		if (resultSet != null) {
-			resultSet.close();
-			resultSet = null;
+	public void releaseConnection(Connection conn) throws SQLException {
+		if (conn != null) {
+			conn.close();
+			conn = null;
 		}
+	}
+
+	public void releaseStatement(Statement statement) throws SQLException {
 		if (statement != null) {
 			statement.close();
 			statement = null;
 		}
-		if (conn != null) {
-			conn.close();
-			conn = null;
+	}
+
+	public void releaseResultSet(ResultSet resultSet) throws SQLException {
+		if (resultSet != null) {
+			resultSet.close();
+			resultSet = null;
 		}
 	}
 

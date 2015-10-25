@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import com.jyuan92.twitter.Twitter;
 import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
+import javafx.scene.chart.PieChart.Data;
 import twitter4j.JSONArray;
 import twitter4j.JSONException;
 import twitter4j.JSONObject;
@@ -33,31 +34,22 @@ public class TwitterDao {
 		return Holder.twitterDao;
 	}
 	
-	public boolean batchInsert(LinkedList<Twitter> twitterList) {
-		Connection conn = null;
+	public boolean insert(Connection conn, Twitter twitter) throws SQLException {
 		PreparedStatement statement = null;
-		ResultSet resultSet = null;
 		try {
-			conn = getConnection();
-			conn.setAutoCommit(false);  
 			statement = conn.prepareStatement(INSERT_TO_TWITTER);
-			for (Twitter twitter : twitterList) {
-				statement.setLong(1, twitter.getTwitterID());
-				statement.setString(2, twitter.getUsername());
-				statement.setDouble(3, twitter.getLatitude());
-				statement.setDouble(4, twitter.getLongitude());
-				statement.setString(5, twitter.getContent());
-				statement.setLong(6, twitter.getTimestamp());
-				statement.setString(7, twitter.getCategory());
-				statement.addBatch();
-			}
-			statement.executeBatch();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			statement.setLong(1, twitter.getTwitterID());
+			statement.setString(2, twitter.getUsername());
+			statement.setDouble(3, twitter.getLatitude());
+			statement.setDouble(4, twitter.getLongitude());
+			statement.setString(5, twitter.getContent());
+			statement.setLong(6, twitter.getTimestamp());
+			statement.setString(7, twitter.getCategory());
+			statement.executeUpdate();
+			return true;
 		} finally {
-			releaseDatabase(conn, statement, resultSet);
+			DatabaseUtil.getInstance().releaseStatement(statement);
 		}
-		return true;
 	}
 
 	public JSONArray getAllTweets() {
@@ -78,6 +70,7 @@ public class TwitterDao {
 				twitterObject.put("category", resultSet.getString("category"));
 				locations.put(twitterObject);
 			}
+			return locations;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException
 				| JSONException e) {
 			e.printStackTrace();
@@ -100,7 +93,9 @@ public class TwitterDao {
 
 	private void releaseDatabase(Connection conn, PreparedStatement statement, ResultSet resultSet) {
 		try {
-			DatabaseUtil.getInstance().release(resultSet, statement, conn);
+			DatabaseUtil.getInstance().releaseResultSet(resultSet);
+			DatabaseUtil.getInstance().releaseStatement(statement);
+			DatabaseUtil.getInstance().releaseConnection(conn);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

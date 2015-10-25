@@ -1,5 +1,8 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ page import="com.jyuan92.twitter.*" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <head>
-  <title>Heatmap</title>
+  <title>Twitter Heatmap</title>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
   <script src="./jquery-2.1.1.min.js"></script>
   <script src="./heatmap.js"></script>
