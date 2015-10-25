@@ -1,8 +1,7 @@
 var map, heatmap;
-var csv = [];
-var twitter;
 var url = window.location.href+ "api/get/twitter";
-var music, news, job;
+var twitter, musicTwitter, newsTwitter, jobTwitter, movieTwitter, 
+	androidTwitter, amazonTwitter, gameTwitter, halloweenTwitter;
 
 function addDataIntoMap(url) {
 	$.getJSON(url, function(data) {
@@ -10,11 +9,21 @@ function addDataIntoMap(url) {
 		$.each(data['result'], function(index, row) {
 			var category = row["category"];
 			if (category === "music") {
-				music.push(new google.maps.LatLng(row["lat"], row["lon"]));
+				musicTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
 			} else if (category === "news") {
-				news.push(new google.maps.LatLng(row["lat"], row["lon"]));
+				newsTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
 			} else if (category === "job") {
-				job.push(new google.maps.LatLng(row["lat"], row["lon"]));
+				jobTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
+			} else if (category === "movie") {
+				movieTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
+			} else if (category === "android") {
+				androidTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
+			} else if (category === "amazon") {
+				amazonTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
+			} else if (category === "game") {
+				gameTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
+			} else if (category === "halloween") {
+				halloweenTwitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
 			}
 			twitter.push(new google.maps.LatLng(row["lat"], row["lon"]));
 		});
@@ -36,10 +45,6 @@ function initialize() {
 }
 
 function loadHeatmap() {
-	music = new google.maps.MVCArray([]);
-	news = new google.maps.MVCArray([]);
-	job = new google.maps.MVCArray([]);
-	twitter = new google.maps.MVCArray([]);
 	heatmap = new google.maps.visualization.HeatmapLayer({
 		data : twitter,
 		radius : 20,
@@ -49,17 +54,36 @@ function loadHeatmap() {
 }
 
 $(document).ready(function() {
+	musicTwitter = new google.maps.MVCArray([]);
+	newsTwitter = new google.maps.MVCArray([]);
+	gameTwitter = new google.maps.MVCArray([]);
+	jobTwitter = new google.maps.MVCArray([]);
+	androidTwitter = new google.maps.MVCArray([]);
+	movieTwitter = new google.maps.MVCArray([]);
+	amazonTwitter = new google.maps.MVCArray([]);
+	halloweenTwitter = new google.maps.MVCArray([]);
+	twitter = new google.maps.MVCArray([]);
 	google.maps.event.addDomListener(window, 'load', initialize);
 	addDataIntoMap(url);
 	
 	$('#select').change(function() { 
 		var category = $(this).children('option:selected').val();
 		if (category == "music") {
-	    	heatmap.set('data', music);
+	    	heatmap.set('data', musicTwitter);
 	    } else if (category == "news") {
-	    	heatmap.set('data', news);
+	    	heatmap.set('data', newsTwitter);
 	    } else if (category == "job") {
-	    	heatmap.set('data', job);
+	    	heatmap.set('data', jobTwitter);
+	    } else if (category == "game") {
+	    	heatmap.set('data', gameTwitter);
+	    } else if (category == "movie") {
+	    	heatmap.set('data', movieTwitter);
+	    } else if (category == "amazon") {
+	    	heatmap.set('data', amazonTwitter);
+	    } else if (category == "android") {
+	    	heatmap.set('data', androidTwitter);
+	    } else if (category == "halloween") {
+	    	heatmap.set('data', halloweenTwitter);
 	    } else {
 	    	heatmap.set('data', twitter);
 	    }

@@ -1,6 +1,10 @@
 <head>
   <title>Heatmap</title>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+  <script src="./jquery-2.1.1.min.js"></script>
+  <script src="./heatmap.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
   <style>
     html, body, #map-canvas {
       padding: 0px;
@@ -19,18 +23,17 @@
   <div id="map-canvas"> </div>
 
   <div id="top" style="text-align: center; position: absolute; top: 20px; right: 20px; width: 180px; height: 120px; background: white;">
-      <h2>Keyword</h2>
-		<select id="select">
-		<option value ="all">All Twitter</option>
-		  <option value ="music">music</option>
-		  <option value ="news">news</option>
-		  <option value="job">job</option>
-		</select>
-    </div>
+    <h2>Keyword</h2>
+    <select id="select">
+	  <option value="all">All Twitter</option>
+      <option value="amazon">Amazon</option>
+      <option value="android">Android</option>
+	  <option value="game">Game</option>
+	  <option value="halloween">Halloween</option>
+	  <option value="job">Job</option>
+	  <option value="movie">Movie</option>
+	  <option value="music">Music</option>
+	  <option value="news">News</option>
+	</select>
   </div>
-  
-  <script src="./jquery-2.1.1.min.js"></script>
-  <script src="./heatmap.js"></script>
-  <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
 </body>

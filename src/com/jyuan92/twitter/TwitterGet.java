@@ -8,49 +8,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
-import com.amazonaws.services.ecs.model.transform.StartTaskResultJsonUnmarshaller;
 import com.jyuan92.db.DatabaseUtil;
 import com.jyuan92.db.TwitterDao;
-import com.sun.javafx.image.IntPixelAccessor;
-import com.sun.org.apache.xml.internal.resolver.helpers.PublicId;
-import com.sun.org.apache.xpath.internal.compiler.Keywords;
 
 public final class TwitterGet {
 	private static final String PROPERTIES_NAME = "config.properties";
-	private static final String PROPERTIES_NOT_FOUND = "property file '" + PROPERTIES_NAME 
+	private static final String PROPERTIES_NOT_FOUND = "property file '" + PROPERTIES_NAME
 			+ "' not found in the classpath";
-	
+
 	private final TwitterDao twitterDao;
 	private final MatchKeyword matchKeyword;
-	private final List<Twitter> twitterList;
 
 	public TwitterGet() {
 		twitterDao = new TwitterDao();
 		matchKeyword = new MatchKeyword();
-		twitterList = new LinkedList<Twitter>();
 	}
-	
+
 	private String oAuthConsumerKey;
 	private String oAuthConsumerSecret;
 	private String token;
 	private String tokenSecret;
-	
+
 	public void getTweets() {
 		checkTableExist();
 		getPropValues();
 
 		ConfigurationBuilder cb = new ConfigurationBuilder();
-		cb.setDebugEnabled(true).setOAuthConsumerKey(oAuthConsumerKey)
-				.setOAuthConsumerSecret(oAuthConsumerSecret)
-				.setOAuthAccessToken(token)
-				.setOAuthAccessTokenSecret(tokenSecret);
+		cb.setDebugEnabled(true).setOAuthConsumerKey(oAuthConsumerKey).setOAuthConsumerSecret(oAuthConsumerSecret)
+				.setOAuthAccessToken(token).setOAuthAccessTokenSecret(tokenSecret);
 
 		TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
 		StatusListener listener = new StatusListener() {
@@ -60,7 +47,7 @@ public final class TwitterGet {
 					String content = status.getText();
 					String category = matchKeyword.getkeyword(content);
 					if (category != null) {
-						System.out.println("--------------------" + category + "--------------------");
+						System.out.println(status.getUser().getName() + " : " + status.getText());
 						long twitterId = status.getUser().getId();
 						String username = status.getUser().getScreenName();
 						Double latitude = status.getGeoLocation().getLatitude();
@@ -68,11 +55,7 @@ public final class TwitterGet {
 						Long timestamp = status.getCreatedAt().getTime();
 						Twitter twitter = new Twitter(twitterId, username, latitude, longitude, content, timestamp,
 								category);
-						twitterList.add(twitter);
-						if (twitterList.size() == 10) {
-							insertTwitterIntoDatabase();
-							twitterList.clear();
-						}
+						insertTwitterIntoDatabase(twitter);
 					}
 				}
 			}
@@ -103,9 +86,12 @@ public final class TwitterGet {
 			}
 		};
 		twitterStream.addListener(listener);
-		twitterStream.sample();
+		FilterQuery tweetFilterQuery = new FilterQuery();
+		tweetFilterQuery
+				.track(new String[] { "halloween", "music", "game", "android", "amazon", "job", "movie", "news" }); // OR
+		twitterStream.filter(tweetFilterQuery);
 	}
-	
+
 	private void getPropValues() {
 		InputStream inputStream = null;
 		try {
@@ -131,7 +117,7 @@ public final class TwitterGet {
 			}
 		}
 	}
-	
+
 	private void checkTableExist() {
 		Connection conn = null;
 		try {
@@ -148,8 +134,8 @@ public final class TwitterGet {
 		}
 	}
 
-	private void insertTwitterIntoDatabase() {
-		while (!twitterDao.batchInsert(twitterList)) {
+	private void insertTwitterIntoDatabase(Twitter twitter) {
+		while (!twitterDao.insert(twitter)) {
 			System.out.println("Update failed, Retrying");
 		}
 		System.out.println("Update successful");

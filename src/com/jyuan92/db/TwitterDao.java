@@ -5,14 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import com.jyuan92.twitter.Twitter;
 
-import javafx.scene.chart.PieChart.Data;
 import twitter4j.JSONArray;
 import twitter4j.JSONException;
 import twitter4j.JSONObject;
@@ -25,24 +20,21 @@ public class TwitterDao {
 			+ "(twitterId LONG, username VARCHAR(50), latitude DOUBLE, longitude DOUBLE,"
 			+ " content VARCHAR(200), timestamp LONG, category VARCHAR(20))";
 
-	public boolean batchInsert(List<Twitter> twitterList) {
+	public boolean insert(Twitter twitter) {
 		Connection conn = null;
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
 		try {
 			conn = getConnection();
 			statement = conn.prepareStatement(INSERT_TO_TWITTER);
-			for (Twitter twitter : twitterList) {
-				statement.setLong(1, twitter.getTwitterID());
-				statement.setString(2, twitter.getUsername());
-				statement.setDouble(3, twitter.getLatitude());
-				statement.setDouble(4, twitter.getLongitude());
-				statement.setString(5, twitter.getContent());
-				statement.setLong(6, twitter.getTimestamp());
-				statement.setString(7, twitter.getCategory());
-				statement.addBatch();
-			}
-			statement.executeBatch();
+			statement.setLong(1, twitter.getTwitterID());
+			statement.setString(2, twitter.getUsername());
+			statement.setDouble(3, twitter.getLatitude());
+			statement.setDouble(4, twitter.getLongitude());
+			statement.setString(5, twitter.getContent());
+			statement.setLong(6, twitter.getTimestamp());
+			statement.setString(7, twitter.getCategory());
+			statement.executeUpdate();
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		} finally {
