@@ -1,4 +1,4 @@
-var interval = 5000;
+var interval = 15000;
 var map, heatmap;
 var url = window.location.href+ "api/get/twitter";
 var twitter, musicTwitter, newsTwitter, jobTwitter, movieTwitter, 
@@ -48,8 +48,8 @@ function initialize() {
 function loadHeatmap() {
 	heatmap = new google.maps.visualization.HeatmapLayer({
 		data : twitter,
-		radius : 20,
-		opacity : 1,
+		radius: $("#radius-slider").slider("value"),
+		opacity: $("#opacity-slider").slider("value")
 	});
 	heatmap.setMap(map);
 }
@@ -87,6 +87,37 @@ $(document).ready(function() {
 	addDataIntoMap(url);
 	
 	startTimer();
+	
+	$(function() {
+		$( "#draggable" ).draggable();
+	});
+	
+	$(function() {
+		$( "#radius-slider" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			min: 1,
+			max: 50,
+			value: 20,
+			slide: function(event, ui) {
+				$("#radius-label").html("radius: " + ui.value);
+				if(heatmap == null) return;
+				heatmap.set('radius', ui.value);
+			}
+		});
+		$( "#opacity-slider" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			min: 0,
+			max: 100,
+			value: 50,
+			slide: function(event, ui) {
+				$("#opacity-label").html("opacity: " + ui.value/100);
+				if(heatmap == null) return;
+				heatmap.set('opacity', ui.value/100);
+			}
+		});
+	});
 	
 	$('#select').change(function() { 
 		var category = $(this).children('option:selected').val();
