@@ -12,6 +12,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.KeyPair;
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalkClient;
 import com.amazonaws.services.elasticbeanstalk.model.CheckDNSAvailabilityRequest;
 import com.amazonaws.services.elasticbeanstalk.model.CheckDNSAvailabilityResult;
@@ -40,6 +41,7 @@ public class Deploy {
 
 	private String accessKey;
 	private String secretKey;
+	private String KeyPair;
 
 	private void getPropValues() {
 		InputStream inputStream = null;
@@ -54,6 +56,7 @@ public class Deploy {
 			// get the property value
 			secretKey = prop.getProperty("secretKey");
 			accessKey = prop.getProperty("accessKey");
+			KeyPair = prop.getProperty("keyPair");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -71,15 +74,18 @@ public class Deploy {
 		// user credentials
 		final String AWS_KEY = deploy.accessKey;
 		final String AWS_SECRET_KEY = deploy.secretKey;
-		final String sampleApp = "Twitt-tw-rw";
-		String versionLabel = "Version1";
+		final String KEY_PAIR = deploy.KeyPair;
+		
+		String sampleApp = "TwitterMap-Sample";
+		String versionLabel = "1.0";
 		String cnamePrefix = "mysampleapplication-fsdfsd";
 		String envName = "TwittAppEn";
-		String KEY_PAIR = "Poly_CloudComputing";
+
 		// S3 parameter
-		String keyName = "Test2.war";
-		String uploadFileName = "Test2.war";
-		String bucketName = "ty-ty-ry";
+		String keyName = "TwitterMap-Sample-KeyName.war";
+		String uploadFileName = "TwitterMap-Sample-uploadFileName.war";
+		String bucketName = "TwitterMap-Sample-bucketName";
+		
 		System.out.println("--Reading credential information...");
 		AWSCredentials credentials = null;
 		try {
@@ -102,19 +108,17 @@ public class Deploy {
 			System.out.println("Uploading a new object to S3 from a file\n");
 			File file = new File(uploadFileName);
 			s3.putObject(new PutObjectRequest(bucketName, keyName, file));
-
 		} catch (AmazonServiceException ase) {
 			System.out.println("Caught an AmazonServiceException, which " + "means your request made it "
 					+ "to Amazon S3, but was rejected with an error response" + " for some reason.");
 			System.out.println("Error Message:    " + ase.getMessage());
-
 		} catch (AmazonClientException ace) {
 			System.out.println("Caught an AmazonClientException");
 			System.out.println("Error Message: " + ace.getMessage());
 		}
 		S3Location sourceBundle = new S3Location();
-		sourceBundle.withS3Bucket(bucketName);// change to your S3Buket
-		sourceBundle.withS3Key(keyName);// change to your application.war
+		sourceBundle.withS3Bucket(bucketName);
+		sourceBundle.withS3Key(keyName);
 
 		AWSElasticBeanstalkClient awsc = new AWSElasticBeanstalkClient(credentials);
 		awsc.setEndpoint("elasticbeanstalk.us-west-2.amazonaws.com");
