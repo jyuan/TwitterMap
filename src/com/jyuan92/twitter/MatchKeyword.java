@@ -4,6 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MatchKeyword {
+	protected static final String[] Keywords = new String[] { "halloween", "music", "game", "android", "amazon", "job",
+			"movie", "news" };
 	private static final String regex = "[mM][uU][sS][iI][cC]|[gG][aA][mM][eE]|[aA][mM][aA][zZ][oO][nN]|[mM][oO][vV][iI][eE]|"
 			+ "[nN][eE][wW][sS]|[aA][nN][dD][rR][oO][iI][dD]|[jJ][oO][bB]|[hH][aA][lL][lL][oO][wW][eE][eE][nN]|";
 	private static final Pattern p = Pattern.compile(regex);
@@ -16,7 +18,7 @@ public class MatchKeyword {
 	private static final Pattern job = Pattern.compile("[jJ][oO][bB]");
 	private static final Pattern halloween = Pattern.compile("[hH][aA][lL][lL][oO][wW][eE][eE][nN]");
 
-	public String getkeyword(String str) {
+	public static String getkeyword(String str) {
 		Matcher match = p.matcher(str);
 		if (match.find()) {
 			if (music.matcher(str).find()) {

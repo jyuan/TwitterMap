@@ -13,18 +13,14 @@ public class TwitterGetServlet extends HttpServlet {
 	private TwitterGet twitterGet = TwitterGet.getInstance();
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * Used to fetch real time twitter data from Twitter
+	 * Notice: once triggered, it will never stop
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		twitterGet.getTweets();
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);

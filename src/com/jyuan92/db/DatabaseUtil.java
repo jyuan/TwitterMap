@@ -26,7 +26,7 @@ public class DatabaseUtil {
 	public Connection getConnection()
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		String jdbcUrl = getPropValues();
+		String jdbcUrl = getJDBCUrl();
 		Connection connection = DriverManager.getConnection(jdbcUrl);
 		return connection;
 	}
@@ -52,7 +52,7 @@ public class DatabaseUtil {
 		}
 	}
 
-	private String getPropValues() {
+	private String getJDBCUrl() {
 		String jdbcUrl = null;
 		InputStream inputStream = null;
 		try {

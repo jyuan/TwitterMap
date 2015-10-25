@@ -18,10 +18,6 @@ public class TwitterFetchServlet extends HttpServlet {
 
 	private TwitterDao twitterDAO = TwitterDao.getInstance();
 	
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws IOException, ServletException {
 		JSONObject json = new JSONObject();
@@ -34,10 +30,6 @@ public class TwitterFetchServlet extends HttpServlet {
 		res.getWriter().write(json.toString());
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);

@@ -58,7 +58,7 @@ public class Twitter {
 	}
 
 	/**
-	 * two twitter are equal if only if the twetterID is the same.
+	 * two twitter are equal if and only if the twetterID is the same.
 	 */
 	@Override
 	public boolean equals(Object obj) {

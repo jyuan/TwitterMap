@@ -39,7 +39,6 @@ public final class TwitterGet {
 	}
 
 	private final TwitterDao twitterDao = TwitterDao.getInstance();
-	private final MatchKeyword matchKeyword = new MatchKeyword();;
 	private TwitterStream twitterStream;
 
 	private String oAuthConsumerKey;
@@ -62,7 +61,7 @@ public final class TwitterGet {
 			public void onStatus(Status status) {
 				if (status.getGeoLocation() != null) {
 					String content = status.getText();
-					String category = matchKeyword.getkeyword(content);
+					String category = MatchKeyword.getkeyword(content);
 					if (category != null) {
 						System.out.println(status.getUser().getName() + " : " + status.getText());
 						long twitterId = status.getUser().getId();
@@ -104,8 +103,7 @@ public final class TwitterGet {
 		};
 		twitterStream.addListener(listener);
 		FilterQuery tweetFilterQuery = new FilterQuery();
-		tweetFilterQuery
-				.track(new String[] { "halloween", "music", "game", "android", "amazon", "job", "movie", "news" }); // OR
+		tweetFilterQuery.track(MatchKeyword.Keywords); // OR
 		tweetFilterQuery.locations(new double[][] { { -180, -90 }, { 180, 90 } });
 		twitterStream.filter(tweetFilterQuery);
 	}

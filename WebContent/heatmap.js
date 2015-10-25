@@ -1,4 +1,4 @@
-var interval = 15000;
+var interval = 30000;
 var map, heatmap;
 var url = window.location.href+ "api/get/twitter";
 var twitter, musicTwitter, newsTwitter, jobTwitter, movieTwitter, 
@@ -37,8 +37,8 @@ function toggleHeatmap() {
 
 function initialize() {
 	var mapOptions = {
-		zoom : 3,
-		center : new google.maps.LatLng(39.496291, -96.830211),
+		zoom: 5,
+		center: new google.maps.LatLng(39.496291, -96.830211),
 		mapTypeId : google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
