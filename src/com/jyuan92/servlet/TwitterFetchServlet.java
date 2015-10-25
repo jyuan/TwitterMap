@@ -16,15 +16,7 @@ public class TwitterFetchServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private TwitterDao twitterDAO;
-	
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public TwitterFetchServlet() {
-		super();
-		twitterDAO = new TwitterDao();
-	}
+	private TwitterDao twitterDAO = TwitterDao.getInstance();
 	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse

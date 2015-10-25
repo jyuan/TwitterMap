@@ -10,8 +10,8 @@ public class Twitter {
 	private final long timestamp;
 	private final String category;
 
-	public Twitter(long twitterID, String username, Double latitude, Double longitude, 
-			String content, long timestamp, String category) {
+	public Twitter(long twitterID, String username, Double latitude, Double longitude, String content, long timestamp,
+			String category) {
 		this.twitterID = twitterID;
 		this.username = username;
 		this.latitude = latitude;
@@ -48,4 +48,36 @@ public class Twitter {
 	public String getCategory() {
 		return category;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (twitterID ^ (twitterID >>> 32));
+		return result;
+	}
+
+	/**
+	 * two twitter are equal if only if the twetterID is the same.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Twitter other = (Twitter) obj;
+		if (twitterID != other.twitterID)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Twitter [twitterID=" + twitterID + ", username=" + username + ", latitude=" + latitude + ", longitude="
+				+ longitude + ", content=" + content + ", timestamp=" + timestamp + ", category=" + category + "]";
+	}
+
 }

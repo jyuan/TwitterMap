@@ -10,15 +10,7 @@ import com.jyuan92.twitter.TwitterGet;;
 
 public class TwitterGetServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private TwitterGet twitterGet;
-
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public TwitterGetServlet() {
-		super();
-		twitterGet = new TwitterGet();
-	}
+	private TwitterGet twitterGet = TwitterGet.getInstance();
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
