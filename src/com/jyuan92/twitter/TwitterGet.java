@@ -2,20 +2,16 @@ package com.jyuan92.twitter;
 
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Properties;
 
+import com.jyuan92.aws.SQSService;
 import com.jyuan92.db.DatabaseUtil;
 import com.jyuan92.db.TwitterDao;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 public final class TwitterGet {
 	private static final String PROPERTIES_NAME = "config.properties";
@@ -30,14 +26,6 @@ public final class TwitterGet {
 		return Holder.twitterGet;
 	}
 
-	private TwitterGet() {
-		try {
-			conn = TwitterDao.getInstance().getConnection();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private final TwitterDao twitterDao = TwitterDao.getInstance();
 	private TwitterStream twitterStream;
 
@@ -46,6 +34,14 @@ public final class TwitterGet {
 	private String token;
 	private String tokenSecret;
 	private Connection conn;
+	
+	private TwitterGet() {
+		try {
+			conn = TwitterDao.getInstance().getConnection();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void getTweets() {
 		checkTableExist();
@@ -54,11 +50,12 @@ public final class TwitterGet {
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setDebugEnabled(true).setOAuthConsumerKey(oAuthConsumerKey).setOAuthConsumerSecret(oAuthConsumerSecret)
 				.setOAuthAccessToken(token).setOAuthAccessTokenSecret(tokenSecret);
-
+		
+		final SQSService sqsService = SQSService.getInstance();
 		twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
 		StatusListener listener = new StatusListener() {
-			@Override
-			public void onStatus(Status status) {
+			
+			@Override public void onStatus(Status status) {
 				if (status.getGeoLocation() != null) {
 					String content = status.getText();
 					String category = MatchKeyword.getkeyword(content);
@@ -72,7 +69,10 @@ public final class TwitterGet {
 						Twitter twitter = new Twitter(twitterId, username, latitude, longitude, content, timestamp,
 								category);
 						try {
+							// insert into database
 							twitterDao.insert(conn, twitter);
+							// insert into SQS
+							sqsService.sendMessage(twitterId, content);
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
@@ -80,24 +80,15 @@ public final class TwitterGet {
 				}
 			}
 
-			@Override
-			public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-			}
+			@Override public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) { }
 
-			@Override
-			public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
-			}
+			@Override public void onTrackLimitationNotice(int numberOfLimitedStatuses) { }
 
-			@Override
-			public void onScrubGeo(long userId, long upToStatusId) {
-			}
+			@Override public void onScrubGeo(long userId, long upToStatusId) { }
 
-			@Override
-			public void onStallWarning(StallWarning warning) {
-			}
+			@Override public void onStallWarning(StallWarning warning) { }
 
-			@Override
-			public void onException(Exception ex) {
+			@Override public void onException(Exception ex) {
 				ex.printStackTrace();
 			}
 		};
@@ -115,7 +106,11 @@ public final class TwitterGet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		twitterStream.cleanUp();
+		twitterStream.clearListeners();
 		twitterStream.shutdown();
+		SQSService sqsService = SQSService.getInstance();
+		sqsService.DeleteQueueService();
 	}
 
 	private void getPropValues() {

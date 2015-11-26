@@ -12,9 +12,6 @@ public class DatabaseUtil {
 	private static final String PROPERTIES_NOT_FOUND = "property file '" + PROPERTIES_NAME
 			+ "' not found in the classpath";
 
-	private DatabaseUtil() {
-	}
-
 	private static class Holder {
 		private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 	}
@@ -22,6 +19,8 @@ public class DatabaseUtil {
 	public static DatabaseUtil getInstance() {
 		return Holder.databaseUtil;
 	}
+	
+	private DatabaseUtil() { }
 
 	public Connection getConnection()
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {

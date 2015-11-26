@@ -23,9 +23,6 @@ public class TwitterDao {
 			+ "(twitterId LONG, username VARCHAR(50), latitude DOUBLE, longitude DOUBLE,"
 			+ " content VARCHAR(200), timestamp LONG, category VARCHAR(20))";
 
-	private TwitterDao() {
-	}
-
 	private static class Holder {
 		private static final TwitterDao twitterDao = new TwitterDao();
 	}
@@ -33,6 +30,8 @@ public class TwitterDao {
 	public static TwitterDao getInstance() {
 		return Holder.twitterDao;
 	}
+	
+	private TwitterDao() { }
 	
 	public boolean insert(Connection conn, Twitter twitter) throws SQLException {
 		PreparedStatement statement = null;

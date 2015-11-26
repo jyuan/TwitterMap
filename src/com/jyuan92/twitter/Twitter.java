@@ -1,5 +1,8 @@
 package com.jyuan92.twitter;
 
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
+
 public class Twitter {
 
 	private final long twitterID;
@@ -76,8 +79,19 @@ public class Twitter {
 
 	@Override
 	public String toString() {
-		return "Twitter [twitterID=" + twitterID + ", username=" + username + ", latitude=" + latitude + ", longitude="
-				+ longitude + ", content=" + content + ", timestamp=" + timestamp + ", category=" + category + "]";
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put("twitterID", twitterID);
+			jsonObject.put("username", username);
+			jsonObject.put("latitude", latitude);
+			jsonObject.put("longitude", longitude);
+			jsonObject.put("content", content);
+			jsonObject.put("timestamp", timestamp);
+			jsonObject.put("category", category);	
+		} catch (JSONException e) {
+			System.out.println(e.getMessage());
+		}		
+		return jsonObject.toString();
 	}
 
 }
