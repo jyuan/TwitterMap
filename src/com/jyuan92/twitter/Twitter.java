@@ -12,9 +12,10 @@ public class Twitter {
 	private final String content;
 	private final long timestamp;
 	private final String category;
+	private final String score;
 
 	public Twitter(long twitterID, String username, Double latitude, Double longitude, String content, long timestamp,
-			String category) {
+			String category, String score) {
 		this.twitterID = twitterID;
 		this.username = username;
 		this.latitude = latitude;
@@ -22,34 +23,39 @@ public class Twitter {
 		this.content = content;
 		this.timestamp = timestamp;
 		this.category = category;
+		this.score = score;
 	}
 
 	public long getTwitterID() {
-		return twitterID;
+		return this.twitterID;
 	}
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public Double getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
 
 	public Double getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
 
 	public String getContent() {
-		return content;
+		return this.content;
 	}
 
 	public long getTimestamp() {
-		return timestamp;
+		return this.timestamp;
 	}
 
 	public String getCategory() {
-		return category;
+		return this.category;
+	}
+	
+	public String getScore() {
+		return this.score;
 	}
 
 	@Override
@@ -79,6 +85,11 @@ public class Twitter {
 
 	@Override
 	public String toString() {
+		return "Twitter [twitterID=" + twitterID + ", username=" + username + ", latitude=" + latitude + ", longitude="
+				+ longitude + ", content=" + content + ", timestamp=" + timestamp + ", category=" + category + ", score=" + score + "]";
+	}
+	
+	public JSONObject getJSONObject() {
 		JSONObject jsonObject = new JSONObject();
 		try {
 			jsonObject.put("twitterID", twitterID);
@@ -87,11 +98,16 @@ public class Twitter {
 			jsonObject.put("longitude", longitude);
 			jsonObject.put("content", content);
 			jsonObject.put("timestamp", timestamp);
-			jsonObject.put("category", category);	
+			jsonObject.put("category", category);
+			jsonObject.put("score", score);
 		} catch (JSONException e) {
 			System.out.println(e.getMessage());
 		}		
-		return jsonObject.toString();
+		return jsonObject;
+	}
+	
+	public String getHeatmapInfo() {
+		return twitterID + "\t\t" + latitude + "\t\t" + longitude + "\t\t" + content;
 	}
 
 }

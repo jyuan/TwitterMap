@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import com.jyuan92.aws.SQSService;
+import com.jyuan92.aws.SQSServiceHandler;
 import com.jyuan92.db.DatabaseUtil;
 import com.jyuan92.db.TwitterDao;
 
@@ -17,6 +17,7 @@ public final class TwitterGet {
 	private static final String PROPERTIES_NAME = "config.properties";
 	private static final String PROPERTIES_NOT_FOUND = "property file '" + PROPERTIES_NAME
 			+ "' not found in the classpath";
+	private static final String NOT_PARSE = "not parse: -9999";
 
 	private static class Holder {
 		private static final TwitterGet twitterGet = new TwitterGet();
@@ -51,7 +52,7 @@ public final class TwitterGet {
 		cb.setDebugEnabled(true).setOAuthConsumerKey(oAuthConsumerKey).setOAuthConsumerSecret(oAuthConsumerSecret)
 				.setOAuthAccessToken(token).setOAuthAccessTokenSecret(tokenSecret);
 		
-		final SQSService sqsService = SQSService.getInstance();
+		final SQSServiceHandler sqsServiceHandler = SQSServiceHandler.getInstance();
 		twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
 		StatusListener listener = new StatusListener() {
 			
@@ -67,12 +68,12 @@ public final class TwitterGet {
 						Double longitude = status.getGeoLocation().getLongitude();
 						Long timestamp = status.getCreatedAt().getTime();
 						Twitter twitter = new Twitter(twitterId, username, latitude, longitude, content, timestamp,
-								category);
+								category, NOT_PARSE);
 						try {
 							// insert into database
 							twitterDao.insert(conn, twitter);
 							// insert into SQS
-							sqsService.sendMessage(twitterId, content);
+							sqsServiceHandler.sendMessage(twitter.getHeatmapInfo());
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
@@ -104,20 +105,18 @@ public final class TwitterGet {
 		try {
 			DatabaseUtil.getInstance().releaseConnection(conn);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		twitterStream.cleanUp();
 		twitterStream.clearListeners();
 		twitterStream.shutdown();
-		SQSService sqsService = SQSService.getInstance();
+		SQSServiceHandler sqsService = SQSServiceHandler.getInstance();
 		sqsService.DeleteQueueService();
 	}
 
 	private void getPropValues() {
-		InputStream inputStream = null;
-		try {
-			Properties prop = new Properties();
-			inputStream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_NAME);
+		Properties prop = new Properties();
+		try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_NAME)) {
 			if (inputStream != null) {
 				prop.load(inputStream);
 			} else {
@@ -129,13 +128,7 @@ public final class TwitterGet {
 			token = prop.getProperty("twitter_token");
 			tokenSecret = prop.getProperty("twitter_token_secret");
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				inputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -143,7 +136,7 @@ public final class TwitterGet {
 		try {
 			twitterDao.checkAndCreateTable();
 		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 

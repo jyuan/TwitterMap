@@ -17,11 +17,11 @@ import twitter4j.JSONObject;
 
 public class TwitterDao {
 	private static final String TABLE_NAME = "twitter";
-	private static final String INSERT_TO_TWITTER = "INSERT INTO " + TABLE_NAME + " VALUES(?,?,?,?,?,?,?)";
-	private static final String GET_GEO_DATA = "SELECT latitude, longitude, category FROM " + TABLE_NAME;
+	private static final String INSERT_TO_TWITTER = "INSERT INTO " + TABLE_NAME + " VALUES(?,?,?,?,?,?,?,?)";
+	private static final String GET_GEO_DATA = "SELECT latitude, longitude, category, score FROM " + TABLE_NAME;
 	private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME
 			+ "(twitterId LONG, username VARCHAR(50), latitude DOUBLE, longitude DOUBLE,"
-			+ " content VARCHAR(200), timestamp LONG, category VARCHAR(20))";
+			+ " content VARCHAR(200), timestamp LONG, category VARCHAR(20), score VARCHAR(20))";
 
 	private static class Holder {
 		private static final TwitterDao twitterDao = new TwitterDao();
@@ -44,6 +44,7 @@ public class TwitterDao {
 			statement.setString(5, twitter.getContent());
 			statement.setLong(6, twitter.getTimestamp());
 			statement.setString(7, twitter.getCategory());
+			statement.setString(8, twitter.getScore());
 			statement.executeUpdate();
 			return true;
 		} finally {
@@ -67,6 +68,7 @@ public class TwitterDao {
 				twitterObject.put("lat", resultSet.getDouble("latitude"));
 				twitterObject.put("lon", resultSet.getDouble("longitude"));
 				twitterObject.put("category", resultSet.getString("category"));
+				twitterObject.put("score", resultSet.getString("score"));
 				locations.put(twitterObject);
 			}
 			return locations;
