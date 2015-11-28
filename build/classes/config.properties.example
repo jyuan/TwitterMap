@@ -7,4 +7,5 @@ db_port=
 twitter_Key=
 twitter_secret=
 twitter_token=
-twitter_token_secret=s
+twitter_token_secret=
+AlchemyAPIKey=
